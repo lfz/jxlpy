@@ -1493,6 +1493,20 @@ cdef class JXLPyDecoder(object):
 
         return data_out.data()[:data_out.size()]
 
+    def get_i2j_frames(self, i, j):
+        frames_out = []
+        self.rewind()
+        JxlDecoderSkipFrames(self.decoder, i)
+        for frame_index in range(i, j+1):
+            frame_data = self.get_frame()   # 这里复用现有 get_frame
+            if frame_data is None:
+                break
+            frames_out.append(frame_data)
+        return frames_out
+
+    def get_all_frame(self):
+        n = self.get_n_frames()
+        return self.get_i2j_frames(0,n)
 
     def __dealloc__(self):
         if self.decoder != NULL:
